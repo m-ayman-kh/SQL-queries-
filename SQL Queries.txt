@@ -1,0 +1,106 @@
+
+
+Cohort Analysis:
+_________________
+
+1-) Build one SQL query to create a cohort of Signup to First Order and show the result. The objective of this cohort is to see, out of the users that signed up in Week N, how many did their first order in Week N+1, N+2, N+3... 
+As an input, you have 2 tables : one with user_id, signup_timestamp AND a second one with user_id, order_timestamp. 
+
+
+SELECT COUNT(DISTINCT signup.user_id) AS weeks_cohort, TIMESTAMPDIFF(WEEK, signup_timestamp, order_timestamp) AS weeks_diff,
+	FROM signup 
+	JOIN signup.user_id = orders.user_id
+	GROUP BY “weeks_diff”
+	ORDER BY “weeks_cohort” DESC;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+2-) Select the average time to second order where the order value is above $40. Given the following table schema. 
+"orders" table with the columns: order_id, order_timestamp, user_id
+
+
+SELECT AVG(order_timestamp - order_diff) AS second_order_lag
+	FROM (SELECT order_id, user_id, order_timestamp, lag(order_timestamp, 1) OVER (PARTITION BY user_id ORDER BY order_timestamp) AS order_diff 
+	FROM orders 
+	WHERE order_value > 40);
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+DataBase Queries:
+__________________
+
+events (table):
+event_date --> date
+event_name --> char
+event_key --> integer
+entity_id --> integer
+user_id --> integer
+country_user --> char
+
+
+entity (table):
+id --> integer
+name --> char
+creation_date --> date
+country --> char
+
+(tables Join)
+events.entity_id = entity.id
+______________________________
+ 
+
+
+3-) 10 Most played games (entity.name) of all time (event_name = play).
+
+
+SELECT  entity.name, COUNT(entity.name) As entity_name
+FROM entity JOIN events
+ON entity.id = events.entity_id
+WHERE entity.id IN (SELECT entity_id FROM events WHERE events.event_name = "play" )
+GROUP BY entity.name
+ORDER BY COUNT(entity.name) DESC
+LIMIT 10;
+
+OR 
+
+SELECT  entity.name, COUNT(entity.name) As entity_name
+FROM entity JOIN events
+ON entity.id = events.entity_id
+WHERE entity.id IN (SELECT entity_id FROM events WHERE events.event_name = "play" GROUP BY entity_id ORDER BY COUNT(entity_id) DESC LIMIT 10)
+GROUP BY entity.name;
+
+
+
+
+4-) Number of plays per user from clubs (entity_id) that come from countries different from his own.
+
+
+SELECT events.user_id, Count(events.user_id) AS plays_count
+  FROM events JOIN entity
+  ON events.entity_id = entity.id
+WHERE events.event_name = "play" AND events.country_user != entity.country
+GROUP BY events.user_id;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
