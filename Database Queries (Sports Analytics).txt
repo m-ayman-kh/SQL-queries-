@@ -1,0 +1,190 @@
+
+
+Database Queries (Sports Analytics):
+_____________________________________
+
+events (table):
+event_date --> date
+event_name --> char
+event_key --> integer
+entity_id --> integer
+user_id --> integer
+country_user --> char
+
+
+entity (table):
+id --> integer
+name --> char
+creation_date --> date
+country --> char
+
+(tables Join)
+events.entity_id = entity.id
+---------------------------------------------------------------------------------------------------------
+ 
+
+
+1-) 10 Most played games (entity.name) of all time (event_name = play).
+
+
+DROP TABLE events;
+CREATE TABLE events (
+	event_date DATE null,
+	event_name CHAR null,
+	event_key INT NOT null  PRIMARY KEY,
+	entity_id INT NOT NULL,
+	user_id INT null,
+	country_user CHAR null
+	);
+ 
+
+INSERT INTO events VALUES ('2018-8-17' , 'play' , 1,  3,  123, 'tunis'); 
+INSERT INTO events VALUES ('2018-8-21' , 'play' , 2,  1,  123, 'taiwan');
+INSERT INTO events VALUES ('2018-8-12' , 'play' , 3,  1,  123, 'waked'); 
+INSERT INTO events VALUES ('2018-8-30' ,  'play', 4,  10, 123, 'sweden');
+INSERT INTO events VALUES ('2018-8-23' , 'play', 5,  1, 456, 'tugo');      
+INSERT INTO events VALUES ('2018-8-29' ,  'play', 6,  3,  456, 'spain');
+INSERT INTO events VALUES ('2018-8-17' , 'play', 7,  1,  789, 'sudan');     
+INSERT INTO events VALUES ('2018-8-25' ,  'session'  , 8,   2,  789, 'algeria');
+INSERT INTO events VALUES ('2018-8-1'  , 'session'  , 9,   6,  156, 'dubai');	  
+INSERT INTO events VALUES ('2018-8-30' ,  'play'  ,    10,  10, 321, 'usa');
+INSERT INTO events VALUES ('2018-8-7'  , 'calender' , 11,  8,  846, 'canada');   
+INSERT INTO events VALUES ('2018-8-19' ,  'search'   , 12 , 7,  548, 'masr'); 
+INSERT INTO events VALUES ('2018-8-27' ,  'click'   , 13,  4, 987, 'uk');	  
+INSERT INTO events VALUES ('2018-8-27' ,  'play'     , 14 , 3,  251, 'palestine');
+   
+SELECT * FROM events;
+	  
+
+
+
+DROP TABLE entity;
+CREATE TABLE entity(
+	id INT NOT NULL PRIMARY KEY,
+	name CHAR null,
+	creation_date DATE null,
+	country CHAR null
+	);
+
+
+INSERT INTO entity VALUES (1,  'ahly-zamalek' , '2018-7-17' , 'egypt'); 	
+INSERT INTO entity VALUES (2,  'toten-liver'  ,  '2018-7-21' , 'uk');
+INSERT INTO entity VALUES (3,  'arsenal-manct', '2018-7-27' , 'uk'); 		
+INSERT INTO entity VALUES (4,  'chels-arese'     ,  '2018-7-23' , 'uk');
+INSERT INTO entity VALUES (5,  'real-barca'   , '2018-7-19' , 'spain'); 	
+INSERT INTO entity VALUES (6,  'mav-seatt'       ,  '2018-7-25' , 'usa');
+INSERT INTO entity VALUES (7,  'yuvi-milan'   , '2018-7-17' , 'italy');	
+INSERT INTO entity VALUES (8,  'ahly-asyou'      ,  '2018-7-27' , 'egypt');
+INSERT INTO entity VALUES (9,  'hilal-gadda'  , '2018-7-1'  , 'saudi'); 	
+INSERT INTO entity VALUES (10, 'stok-aden'       ,  '2018-7-29' , 'sweden');
+INSERT INTO entity VALUES (11, 'wasl-ein'     , '2018-7-1'  , 'dubai'); 	
+INSERT INTO entity VALUES (12, 'valenc-atlt'     ,  '2018-7-30' , 'spain');
+INSERT INTO entity VALUES (13, 'napoli-inter' , '2018-7-12' , 'italy');	
+INSERT INTO entity VALUES (14, 'ayax-fenord'     ,  '2018-7-30' , 'holand');
+
+
+SELECT * FROM entity;
+
+
+-- SELECT events.event_name, events.entity_id, COUNT(entity_id) FROM events WHERE events.event_name = "play" GROUP BY entity_id ORDER BY COUNT(entity_id) DESC LIMIT 10;
+
+
+
+
+SELECT  entity.name, COUNT(entity.name) As entity_name
+FROM entity JOIN events
+ON entity.id = events.entity_id
+WHERE entity.id IN (SELECT entity_id FROM events WHERE events.event_name = "play" )
+GROUP BY entity.name
+ORDER BY COUNT(entity.name) DESC
+LIMIT 10;
+
+OR 
+
+SELECT  entity.name, COUNT(entity.name) As entity_name
+FROM entity JOIN events
+ON entity.id = events.entity_id
+WHERE entity.id IN (SELECT entity_id FROM events WHERE events.event_name = "play" GROUP BY entity_id ORDER BY COUNT(entity_id) DESC LIMIT 10)
+GROUP BY entity.name;
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+2-) Number of plays per user from clubs (entity_id) that come from countries different from his own.
+
+
+DROP TABLE events;
+CREATE TABLE events (
+
+event_date DATE null,
+event_name CHAR null,
+event_key INT NOT null  PRIMARY KEY,
+entity_id INT NOT NULL,
+user_id INT null,
+country_user CHAR null
+);
+ INSERT INTO events VALUES ('2018-8-17' , 'play'     , 1,   3,  111, 'sweden');   
+INSERT INTO events VALUES ('2018-8-21' ,  'play'     , 2,   10, 111, 'sweden');
+ INSERT INTO events VALUES ('2018-8-12' , 'play'     , 3,   1,  111, 'sweden');   
+INSERT INTO events VALUES ('2018-8-30' ,  'session'  , 4,   8,  111, 'sweden');
+ INSERT INTO events VALUES ('2018-8-23' , 'play'     , 5,   1,  555,  'tugo');    
+INSERT INTO events VALUES ('2018-8-29' ,  'play'     , 6,   3,  555,  'tugo');
+ INSERT INTO events VALUES ('2018-8-17' , 'play'     , 7,   1,  777,  'italy');   
+INSERT INTO events VALUES ('2018-8-25' ,  'play'     , 8,   2,  777,  'italy');
+ INSERT INTO events VALUES ('2018-8-1'  , 'play'     , 9,   7, 777,  'italy');	  
+INSERT INTO events VALUES ('2018-8-30' ,  'play'     , 10,  12, 777,  'italy');
+ INSERT INTO events VALUES ('2018-8-7'  , 'session'  , 11,  8,  777,  'italy');    
+INSERT INTO events VALUES ('2018-8-19' ,  'search'   , 12,  7,  999,  'masr'); 
+ INSERT INTO events VALUES ('2018-8-27' ,  'play'    , 13,  1,  222,  'egypt');	  
+INSERT INTO events VALUES ('2018-8-27' ,  'click'    , 14 , 3,  101,  'palestine');
+
+
+DROP TABLE entity;
+CREATE TABLE entity(
+	id INT NOT NULL PRIMARY KEY,
+	name CHAR null,
+	creation_date DATE null,
+	country CHAR null
+	);
+
+
+INSERT INTO entity VALUES (1,  'ahly-zamalek' , '2018-7-17' , 'egypt'); 	
+INSERT INTO entity VALUES (2,  'toten-liver'  ,  '2018-7-21' , 'uk');
+INSERT INTO entity VALUES (3,  'arsenal-manct', '2018-7-27' , 'uk'); 		
+INSERT INTO entity VALUES (4,  'chels-arese'     ,  '2018-7-23' , 'uk');
+INSERT INTO entity VALUES (5,  'real-barca'   , '2018-7-19' , 'spain'); 	
+INSERT INTO entity VALUES (6,  'mav-seatt'       ,  '2018-7-25' , 'usa');
+INSERT INTO entity VALUES (7,  'yuvi-milan'   , '2018-7-17' , 'italy');	
+INSERT INTO entity VALUES (8,  'ahly-asyou'      ,  '2018-7-27' , 'egypt');
+INSERT INTO entity VALUES (9,  'hilal-gadda'  , '2018-7-1'  , 'saudi'); 	
+INSERT INTO entity VALUES (10, 'stok-aden'       ,  '2018-7-29' , 'sweden');
+INSERT INTO entity VALUES (11, 'wasl-ein'     , '2018-7-1'  , 'dubai'); 	
+INSERT INTO entity VALUES (12, 'valenc-atlt'     ,  '2018-7-30' , 'spain');
+INSERT INTO entity VALUES (13, 'napoli-inter' , '2018-7-12' , 'italy');	
+INSERT INTO entity VALUES (14, 'ayax-fenord'     ,  '2018-7-30' , 'holand');
+
+
+SELECT * FROM entity;
+
+
+
+
+SELECT events.user_id, Count(events.user_id) AS plays_count
+  FROM events JOIN entity
+  ON events.entity_id = entity.id
+WHERE events.event_name = "play" AND events.country_user != entity.country
+GROUP BY events.user_id;
+
+
+
+
+
+
+
+
