@@ -1,5 +1,2 @@
 # SQL-queries-
-SQL queries for:
-1.) Cohort Analysis
-2.) 2nd order lag (e-commerce)
-3.) Database queries (Sports Analytics)
+SQL queries for: Cohort Analysis - 2nd order lag (e-commerce) - Database queries (Sports Analytics)
