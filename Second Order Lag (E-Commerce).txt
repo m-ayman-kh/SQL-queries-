@@ -1,0 +1,28 @@
+
+
+Second Order Lag (E-Commerce):
+______________________________
+
+
+1-) Select the average time to second order where the order value is above $40. Given the following table schema. 
+"orders" table with the columns: order_id, order_timestamp, user_id
+
+
+DROP TABLE orders;
+CREATE TABLE orders( order_id integer, order_timestamp date, user_id integer, order_value integer);
+ INSERT INTO orders VALUES (1, '1990-12-17', 4, 25); INSERT INTO orders VALUES (2,  '1996-04-12',3, 85);
+ INSERT INTO orders VALUES (3, '1996-04-07', 3, 51); INSERT INTO orders VALUES (4,  '1996-04-19',3, 71);
+ INSERT INTO orders VALUES (5, '1990-12-23', 4, 14); INSERT INTO orders VALUES (6,  '1990-12-25',4, 92);
+ INSERT INTO orders VALUES (7, '1990-12-22', 4, 81); INSERT INTO orders VALUES (8,  '2000-03-30',2, 65);
+ INSERT INTO orders VALUES (9, '1990-12-01', 4, 35); INSERT INTO orders VALUES (10, '2000-03-09',2, 31);
+ INSERT INTO orders VALUES (11,'2000-03-15', 2, 64); INSERT INTO orders VALUES (12, '1990-12-16',4, 54);
+ INSERT INTO orders VALUES (13,'2000-03-03', 2, 29); INSERT INTO orders VALUES (14, '1995-10-12',1, 10);
+
+SELECT * FROM orders;
+
+
+
+SELECT AVG(order_timestamp - order_diff) AS second_order_lag
+	FROM (SELECT order_id, user_id, order_timestamp, lag(order_timestamp, 1) OVER (PARTITION BY user_id ORDER BY order_timestamp) AS order_diff 
+	FROM orders 
+	WHERE order_value > 40);
